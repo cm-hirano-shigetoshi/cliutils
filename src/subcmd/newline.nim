@@ -48,5 +48,5 @@ proc newline*(tmpArgs: openArray[string]) =
   if subst != nil:
     subst = subst.replace(re"([^\\])\\n", "\1\n")
     str = str.replace("\n",subst)
-  echo str.replace("\r","\\r")
+  stdout.write str.replace("\r","\\r")
 
