@@ -7,8 +7,9 @@ proc endswith*(tmpArgs: openArray[string]) =
   Usage: endswith [OPTION]... QUERY [FILE]
     -i      : ignore case.
     -m      : remove coloring.
-    -s      : remove leading spaces."""
-    echo s
+    -s      : remove leading spaces.
+"""
+    stdout.echo s
 
   var ignore_case = false
   var monochrome = false

@@ -8,8 +8,9 @@ proc newline*(tmpArgs: openArray[string]) =
     -r=<str>: replace newlines.
     -l=<int>: put N leading newlines.
     -t=<int>: put N trailing newlines.
-    -z      : remove all tail newlines."""
-    echo s
+    -z      : remove all tail newlines.
+"""
+    stdout.echo s
 
   var args: seq[string] = @[]
   var subst: string

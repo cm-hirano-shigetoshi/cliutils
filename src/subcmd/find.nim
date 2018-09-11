@@ -7,8 +7,9 @@ proc find*(tmpArgs: openArray[string]) =
   Usage: replace [OPTION]... <before> <after> [FILE]
     -i      : ignore case.
     -b      : insert string to the prev position of matched.
-    -a      : insert string to the next position of matched."""
-    echo s
+    -a      : insert string to the next position of matched.
+"""
+    stdout.echo s
 
   var args: seq[string] = @[]
   if tmpArgs.len > 0:

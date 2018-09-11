@@ -5,8 +5,9 @@ proc de*(tmpArgs: openArray[string]) =
   proc usage() =
     let s = """
   Usage: de [OPTION]... PATTERN [FILE]
-    -n      : repeat N times."""
-    echo s
+    -n      : repeat N times.
+"""
+    stdout.echo s
 
   var repeatN = 1
 

@@ -6,8 +6,9 @@ proc unique*(tmpArgs: openArray[string]) =
     let s = """
   Usage: line [OPTION]... [FILE]
     -b      : backward search.
-    -f      : avoid comparing the first N fields."""
-    echo s
+    -f      : avoid comparing the first N fields.
+"""
+    stdout.echo s
 
   var args: seq[string] = @[]
   var forward = true

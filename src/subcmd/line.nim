@@ -9,8 +9,9 @@ proc line*(tmpArgs: openArray[string]) =
     -v      : invert match.
     -B=<int>: also show before n lines.
     -A=<int>: also show after n lines.
-    -C=<int>: also show before and after n+n lines."""
-    echo s
+    -C=<int>: also show before and after n+n lines.
+"""
+    stdout.echo s
 
   var args: seq[string] = @[]
   var zero = false

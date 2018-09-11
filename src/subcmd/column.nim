@@ -10,8 +10,9 @@ proc column*(tmpArgs: openArray[string]) =
     -d <str>: delimiter; default="\t".
     -r      : regex delimiter str.
     -C      : delimtier=",".
-    -S      : use regex delimiter="\s+"."""
-    echo s
+    -S      : use regex delimiter="\s+".
+"""
+    stdout.echo s
 
   var args: seq[string] = @[]
   var delimiter = "\t"

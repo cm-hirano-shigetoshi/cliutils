@@ -5,8 +5,9 @@ proc randomize*(tmpArgs: openArray[string]) =
   proc usage() =
     let s = """
   Usage: randomize [OPTION]... [FILE]
-    -n <int>: show only required N lines."""
-    echo s
+    -n <int>: show only required N lines.
+"""
+    stdout.echo s
 
   var args: seq[string] = @[]
   var requireN = 0
