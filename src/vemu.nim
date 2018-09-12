@@ -34,7 +34,7 @@ proc getE(): int =
   s = line.find(" ", cursor+2)
   t = line.find("\t", cursor+2)
   if s == -1 and t == -1:
-    return -1
+    return line.len-1
   elif s == -1:
     return t-1
   elif t == -1:
@@ -53,7 +53,35 @@ proc getW(): int =
       return -1
   return p
 
+proc getB(): int =
+  var s: int
+  var t: int
+  s = line.rfind(" ", cursor-2)
+  t = line.rfind("\t", cursor-2)
+  if s == -1 and t == -1:
+    return 0
+  elif s == -1:
+    return t+1
+  elif t == -1:
+    return s+1
+  else:
+    return max(s,t)+1
+
+proc getHead(): int =
+  var p = 0
+  while $line[p] == " " or $line[p] == "\t":
+    p += 1
+    if p >= line.len:
+      return 0
+  return p
+
 proc pos(q: string): int =
+  if q == "0":
+    return 0
+  if q == "^":
+    return getHead()
+  if q == "$" or q == "D":
+    return line.len-1
   if q == "h":
     return max(cursor-1, 0)
   if q == "l":
@@ -62,6 +90,8 @@ proc pos(q: string): int =
     return getE()
   if q == "W":
     return getW()
+  if q == "B":
+    return getB()
   stderr.writeline("Unsupported char: ", q)
 
 proc find(c: string): int =
@@ -74,11 +104,20 @@ proc move(p: int) =
   if p >= 0:
     cursor = p
 
-proc delete(p: int) =
+proc deleteForward(p: int) =
   if p >= 0:
     line = line[0 .. cursor-1] & line[p+1 .. line.len-1]
   else:
     line = line[0 .. cursor-1]
+
+proc deleteTill(p: int) =
+  if p >= 0:
+    line = line[0 .. cursor-1] & line[p .. line.len-1]
+  else:
+    line = line[0 .. cursor-1]
+
+proc deleteBackward(p: int) =
+  line = line[cursor .. line.len-1]
 
 
 let query = args[0]; args.delete(0)
@@ -87,14 +126,12 @@ for orig_line in readLinesFromFileOrStdin(args):
   cursor = 0
   var i = 0
   while i < query.len:
-    let q = $query[i]
-
     #[ 1command ]#
-    case q
-    of "h", "l", "E", "W":
-      move(pos(q))
+    case $line[i]
+    of "0", "^", "$", "h", "l", "E", "W":
+      move(pos($line[i]))
     of "D":
-      delete(line.len-1)
+      deleteForward(pos($query[i]))
 
     #[ 2commands ]#
     of "f":
@@ -106,7 +143,20 @@ for orig_line in readLinesFromFileOrStdin(args):
     of "T":
       i += 1; move(rfind($query[i])+1)
     of "d":
-      i += 1; delete(pos($query[i])-1)
+      i += 1;
+      case $query[i]:
+      of "0":
+        deleteBackward(0)
+      of "l", "W":
+        deleteTill(pos($query[i]))
+      of "E", "$":
+        deleteForward(pos($query[i]))
+      of "^":
+        let head = getHead()
+        if cursor < head:
+          deleteTill(head)
+        else:
+          deleteBackward(head)
     i += 1
-  echo line
+  echo line, " (", cursor, ")"
 
