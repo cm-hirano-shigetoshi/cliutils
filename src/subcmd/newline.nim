@@ -10,7 +10,7 @@ proc newline*(tmpArgs: openArray[string]) =
     -t=<int>: put N trailing newlines.
     -z      : remove all tail newlines.
 """
-    stdout.echo s
+    stdout.write s
 
   var args: seq[string] = @[]
   var subst: string

@@ -12,7 +12,7 @@ proc column*(tmpArgs: openArray[string]) =
     -C      : delimtier=",".
     -S      : use regex delimiter="\s+".
 """
-    stdout.echo s
+    stdout.write s
 
   var args: seq[string] = @[]
   var delimiter = "\t"

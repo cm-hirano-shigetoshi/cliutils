@@ -7,7 +7,7 @@ proc randomize*(tmpArgs: openArray[string]) =
   Usage: randomize [OPTION]... [FILE]
     -n <int>: show only required N lines.
 """
-    stdout.echo s
+    stdout.write s
 
   var args: seq[string] = @[]
   var requireN = 0
