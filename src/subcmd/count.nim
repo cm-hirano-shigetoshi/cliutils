@@ -10,7 +10,7 @@ proc count*(tmpArgs: openArray[string]) =
     stdout.write s
 
   var args: seq[string] = @[]
-  var filter = -2
+  var filter = -1
   if tmpArgs.len > 0:
     try:
       var p = initOptParser(@tmpArgs)
@@ -27,7 +27,6 @@ proc count*(tmpArgs: openArray[string]) =
       quit(1)
 
   let query = args[0]; args.delete(0)
-  var found = false
   var found_forN = false
   for line in readLinesFromFileOrStdin(args):
     var n = 0
@@ -39,17 +38,14 @@ proc count*(tmpArgs: openArray[string]) =
         p += query.len
       else:
         break
-    if n > 0:
-      found = true
-    if filter == -2:
+    if filter == -1:
+      found_forN = true
       echo n
     elif n == filter:
       found_forN = true
       echo line
-  if not found:
+  if not found_forN:
     quit(1)
-  elif not found_forN:
-    quit(2)
   else:
     quit(0)
 
