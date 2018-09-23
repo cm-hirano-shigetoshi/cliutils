@@ -1,6 +1,16 @@
 import strutils, parseopt, nre, tables, algorithm
 import ../lib/io
 
+proc filter(n: int, select :int, cmp: string): bool =
+  if cmp == "":
+    return n == select
+  elif cmp == "+":
+    return n >= select
+  elif cmp == "<":
+    return n < select
+  elif cmp == ">":
+    return n > select
+
 proc countLine(line: string, query: string): int =
   var n = 0
   var p = 0
@@ -17,14 +27,15 @@ proc count*(tmpArgs: openArray[string]) =
   proc usage() =
     let s = """
   Usage: count [OPTION]... QUERY [FILE]
-    -n=<int>: show only lines have N of queries.
+    -n=<str>: show only lines have N of queries.
     -s=     : sort accending.
     -r=     : sort descending when with "-s".
 """
     stdout.write s
 
   var args: seq[string] = @[]
-  var filter = -1
+  var select = -1
+  var cmp = ""
   var sort = false
   var reverse = false
   if tmpArgs.len > 0:
@@ -34,11 +45,21 @@ proc count*(tmpArgs: openArray[string]) =
         if kind == cmdArgument:
           args.add(key)
         elif (kind == cmdShortOption and key == "n"):
-           filter = val.parseInt
+          if val.endswith("+"):
+            cmp = "+"
+            select = val[0 .. val.len-2].parseInt
+          elif val.startswith("<"):
+            cmp = "<"
+            select = val[1 .. val.len-1].parseInt
+          elif val.startswith(">"):
+            cmp = ">"
+            select = val[1 .. val.len-1].parseInt
+          else:
+            select = val.parseInt
         elif (kind == cmdShortOption and key == "s"):
-           sort = true
+          sort = true
         elif (kind == cmdShortOption and key == "r"):
-           reverse = true
+          reverse = true
         else:
           usage()
           quit(0)
@@ -56,21 +77,23 @@ proc count*(tmpArgs: openArray[string]) =
       count2str[n].add(line)
     if not reverse:
       for k in count2str.keys:
-        echo count2str[k].join("\n")
+        if select == -1 or filter(k, select, cmp):
+          echo count2str[k].join("\n")
     else:
       var kk:seq[int] = @[]
       for k in count2str.keys:
         kk.add(k)
       for k in kk.reversed:
-        echo count2str[k].join("\n")
+        if select == -1 or filter(k, select, cmp):
+          echo count2str[k].join("\n")
   else:
     var found_forN = false
     for line in readLinesFromFileOrStdin(args):
       let n = countLine(line, query)
-      if filter == -1:
+      if select == -1:
         found_forN = true
         echo n
-      elif n == filter:
+      elif filter(n, select, cmp):
         found_forN = true
         echo line
     if not found_forN:
