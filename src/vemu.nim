@@ -127,9 +127,9 @@ for orig_line in readLinesFromFileOrStdin(args):
   var i = 0
   while i < query.len:
     #[ 1command ]#
-    case $line[i]
+    case $query[i]
     of "0", "^", "$", "h", "l", "E", "W":
-      move(pos($line[i]))
+      move(pos($query[i]))
     of "D":
       deleteForward(pos($query[i]))
 
@@ -158,5 +158,5 @@ for orig_line in readLinesFromFileOrStdin(args):
         else:
           deleteBackward(head)
     i += 1
-  echo line, " (", cursor, ")"
+  echo line
 

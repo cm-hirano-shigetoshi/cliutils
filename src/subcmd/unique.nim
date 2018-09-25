@@ -8,7 +8,7 @@ proc unique*(tmpArgs: openArray[string]) =
     -b      : backward search.
     -f      : avoid comparing the first N fields.
 """
-    stdout.echo s
+    stdout.write s
 
   var args: seq[string] = @[]
   var forward = true

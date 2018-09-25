@@ -7,7 +7,7 @@ proc de*(tmpArgs: openArray[string]) =
   Usage: de [OPTION]... PATTERN [FILE]
     -n      : repeat N times.
 """
-    stdout.echo s
+    stdout.write s
 
   var repeatN = 1
 

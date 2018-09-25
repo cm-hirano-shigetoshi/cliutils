@@ -9,7 +9,7 @@ proc endswith*(tmpArgs: openArray[string]) =
     -m      : remove coloring.
     -s      : remove leading spaces.
 """
-    stdout.echo s
+    stdout.write s
 
   var ignore_case = false
   var monochrome = false

@@ -9,7 +9,7 @@ proc find*(tmpArgs: openArray[string]) =
     -b      : insert string to the prev position of matched.
     -a      : insert string to the next position of matched.
 """
-    stdout.echo s
+    stdout.write s
 
   var args: seq[string] = @[]
   if tmpArgs.len > 0:

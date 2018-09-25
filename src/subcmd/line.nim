@@ -11,7 +11,7 @@ proc line*(tmpArgs: openArray[string]) =
     -A=<int>: also show after n lines.
     -C=<int>: also show before and after n+n lines.
 """
-    stdout.echo s
+    stdout.write s
 
   var args: seq[string] = @[]
   var zero = false
