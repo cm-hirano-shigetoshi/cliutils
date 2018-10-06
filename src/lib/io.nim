@@ -28,12 +28,20 @@ iterator readLines*(file: string): string =
   let f = open(file, FileMode.fmRead)
   defer: f.close()
   var line: string
-  while f.readline(line):
-    yield line.replace("\r","").replace(re"\n$","")
+  try:
+    while true:
+      line = f.readline
+      yield line.replace("\r","").replace(re"\n$","")
+  except:
+    discard
 iterator readLinesFromStdin*(): string =
   var line: string
-  while stdin.readline(line):
-    yield line.replace("\r","").replace(re"\n$","")
+  try:
+    while true:
+      line = stdin.readline
+      yield line.replace("\r","").replace(re"\n$","")
+  except:
+    discard
 iterator readLinesFromFileOrStdin*(args: seq[string]): string =
   if args.len < 1 or args[0] == "-":
     for line in readLinesFromStdin():
@@ -46,12 +54,20 @@ iterator readRawLines*(file: string): string =
   let f = open(file, FileMode.fmRead)
   defer: f.close()
   var line: string
-  while f.readline(line):
-    yield line.replace("\r","").replace(re"\n$","")
+  try:
+    while true:
+      line = f.readline
+      yield line.replace("\r","").replace(re"\n$","")
+  except:
+    discard
 iterator readRawLinesFromStdin*(): string =
   var line: string
-  while stdin.readline(line):
-    yield line.replace("\r","").replace(re"\n$","")
+  try:
+    while true:
+      line = stdin.readline
+      yield line.replace("\r","").replace(re"\n$","")
+  except:
+    discard
 iterator readRawLinesFromFileOrStdin*(args: seq[string]): string =
   if args.len < 1 or args[0] == "-":
     for line in readRawLinesFromStdin():
