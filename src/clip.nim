@@ -30,5 +30,5 @@ except:
 
 let str = readAllFromFileOrStdin(args).join("\n")
 let command = "echo -n 'clipboard\n" & str & "' | nc " & host & " " & port
-discard execCmd(command)
+discard startProcess(command)
 

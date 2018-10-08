@@ -27,5 +27,5 @@ proc find*(tmpArgs: openArray[string]) =
       usage()
       quit(1)
 
-  #var ls = execCmd("ls -lR --color=always " & args.join(" ")).split("\n")
-  echo execCmd("ls -lR --color=always " & args.join(" "))
+  #var ls = startProcess("ls -lR --color=always " & args.join(" ")).split("\n")
+  echo startProcess("ls -lR --color=always " & args.join(" "))
