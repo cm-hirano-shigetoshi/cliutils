@@ -23,7 +23,7 @@ except:
   quit(1)
 
 
-#Tue Sep 11 21:21:18 DST 2018
+#Tue Sep 11 21:21:18 JST 2018
 #0123456789012345678901234567
 var line = ""
 var cursor = 0
@@ -98,7 +98,16 @@ proc find(c: string): int =
   return line.find(c, cursor+1)
 
 proc rfind(c: string): int =
-  return line.rfind(c, cursor-1)
+  return line.rfind(c, cursor+1)
+
+proc till(c: string): int =
+  return line.find(c, cursor+1) - 1
+
+proc rtill(c: string): int =
+  let p = line.rfind(c, cursor-1)
+  if p == -1:
+    return -1
+  return p + 1
 
 proc move(p: int) =
   if p >= 0:
@@ -107,17 +116,10 @@ proc move(p: int) =
 proc deleteForward(p: int) =
   if p >= 0:
     line = line[0 .. cursor-1] & line[p+1 .. line.len-1]
-  else:
-    line = line[0 .. cursor-1]
-
-proc deleteTill(p: int) =
-  if p >= 0:
-    line = line[0 .. cursor-1] & line[p .. line.len-1]
-  else:
-    line = line[0 .. cursor-1]
 
 proc deleteBackward(p: int) =
-  line = line[cursor .. line.len-1]
+  if p >= 0:
+    line = line[0 .. p] & line[cursor .. line.len-1]
 
 proc blockEnd() =
   repeat = 0
@@ -133,7 +135,7 @@ for orig_line in readLinesFromFileOrStdin(args):
   cursor = 0
   var i = 0
   while i < query.len:
-    stderr.writeline(cursor, ": ", query[i..query.len]) #debug
+    #stderr.writeline(cursor, ": ", query[i..query.len]) #debug
     #[ 1command ]#
     case $query[i]
     of "1", "2", "3", "4", "5", "6", "7", "8", "9":
@@ -164,10 +166,10 @@ for orig_line in readLinesFromFileOrStdin(args):
       i += 1; move(rfind($query[i]))
       blockEnd()
     of "t":
-      i += 1; move(find($query[i])-1)
+      i += 1; move(till($query[i]))
       blockEnd()
     of "T":
-      i += 1; move(rfind($query[i])+1)
+      i += 1; move(rtill($query[i]))
       blockEnd()
     of "d":
       i += 1
@@ -176,7 +178,7 @@ for orig_line in readLinesFromFileOrStdin(args):
         deleteBackward(pos($query[i]))
         blockEnd()
       of "l", "W":
-        deleteTill(pos($query[i]))
+        deleteForward(pos($query[i])-1)
         blockEnd()
       of "E", "$", "]":
         deleteForward(pos($query[i]))
@@ -184,35 +186,35 @@ for orig_line in readLinesFromFileOrStdin(args):
       of "^":
         let head = getHead()
         if cursor < head:
-          deleteTill(head)
+          deleteForward(head-1)
         else:
           deleteBackward(head)
         blockEnd()
       of "f":
         i += 1
         let target = find($query[i])
-        deleteTill(target)
+        deleteForward(target)
         blockEnd()
       of "F":
         i += 1
         let target = rfind($query[i])
-        deleteBackward(target)
+        deleteBackward(target-1)
         blockEnd()
       of "t":
         i += 1
-        let target = find($query[i]) - 1
-        deleteTill(target)
+        let target = till($query[i])
+        deleteForward(target)
         blockEnd()
       of "T":
         i += 1
-        let target = rfind($query[i]) + 1
-        deleteBackward(target)
+        let target = rtill($query[i])
+        deleteBackward(target-1)
         blockEnd()
       else:
         unsupportedError($query[i])
     else:
       unsupportedError($query[i])
     i += 1
-  stderr.writeline(cursor) #debug
+  #stderr.writeline(cursor) #debug
   echo line
 
