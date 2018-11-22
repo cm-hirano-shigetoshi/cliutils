@@ -188,6 +188,26 @@ for orig_line in readLinesFromFileOrStdin(args):
         else:
           deleteBackward(head)
         blockEnd()
+      of "f":
+        i += 1
+        let target = find($query[i])
+        deleteTill(target)
+        blockEnd()
+      of "F":
+        i += 1
+        let target = rfind($query[i])
+        deleteBackward(target)
+        blockEnd()
+      of "t":
+        i += 1
+        let target = find($query[i]) - 1
+        deleteTill(target)
+        blockEnd()
+      of "T":
+        i += 1
+        let target = rfind($query[i]) + 1
+        deleteBackward(target)
+        blockEnd()
       else:
         unsupportedError($query[i])
     else:
