@@ -80,7 +80,7 @@ proc pos(q: string): int =
     return 0
   if q == "^":
     return getHead()
-  if q == "$" or q == "D":
+  if q == "$" or q == "]" or q == "D":
     return line.len-1
   if q == "h":
     return max(cursor-1, 0)
@@ -126,9 +126,11 @@ for orig_line in readLinesFromFileOrStdin(args):
   cursor = 0
   var i = 0
   while i < query.len:
+    #stderr.write(cursor, ": ")
+    #stderr.writeline(query[i..query.len])
     #[ 1command ]#
     case $query[i]
-    of "0", "^", "$", "h", "l", "E", "W":
+    of "0", "^", "$", "]", "h", "l", "E", "W", "B":
       move(pos($query[i]))
     of "D":
       deleteForward(pos($query[i]))
@@ -146,10 +148,10 @@ for orig_line in readLinesFromFileOrStdin(args):
       i += 1;
       case $query[i]:
       of "0":
-        deleteBackward(0)
+        deleteBackward(pos($query[i]))
       of "l", "W":
         deleteTill(pos($query[i]))
-      of "E", "$":
+      of "E", "$", "]":
         deleteForward(pos($query[i]))
       of "^":
         let head = getHead()
@@ -157,6 +159,10 @@ for orig_line in readLinesFromFileOrStdin(args):
           deleteTill(head)
         else:
           deleteBackward(head)
+    else:
+      echo "ERROR"
+      quit(1)
     i += 1
+  #stderr.writeline(cursor)
   echo line
 
