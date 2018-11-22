@@ -27,6 +27,7 @@ except:
 #0123456789012345678901234567
 var line = ""
 var cursor = 0
+var repeat = 0
 
 proc getE(): int =
   var s: int
@@ -118,6 +119,9 @@ proc deleteTill(p: int) =
 proc deleteBackward(p: int) =
   line = line[cursor .. line.len-1]
 
+proc blockEnd() =
+  repeat = 0
+
 proc unsupportedError(q: string) =
   stderr.writeline("[Error] Unsupported char: ", q)
   quit(1)
@@ -129,43 +133,66 @@ for orig_line in readLinesFromFileOrStdin(args):
   cursor = 0
   var i = 0
   while i < query.len:
-    #stderr.writeline(cursor, ": ", query[i..query.len]) #debug
+    stderr.writeline(cursor, ": ", query[i..query.len]) #debug
     #[ 1command ]#
     case $query[i]
-    of "0", "^", "$", "]", "h", "l", "E", "W", "B":
-      move(pos($query[i]))
+    of "1", "2", "3", "4", "5", "6", "7", "8", "9":
+      if repeat > 0:
+        repeat = repeat * 10 + parseInt($query[i])
+      else:
+        repeat = parseInt($query[i])
+    of "0":
+      if repeat > 0:
+        repeat = repeat * 10
+      else:
+        move(pos($query[i]))
+        blockEnd()
+    of "^", "$", "]", "h", "l", "E", "W", "B":
+      repeat = max(repeat, 1)
+      for r in 1 .. repeat:
+        move(pos($query[i]))
+      blockEnd()
     of "D":
       deleteForward(pos($query[i]))
+      blockEnd()
 
     #[ 2commands ]#
     of "f":
       i += 1; move(find($query[i]))
+      blockEnd()
     of "F":
       i += 1; move(rfind($query[i]))
+      blockEnd()
     of "t":
       i += 1; move(find($query[i])-1)
+      blockEnd()
     of "T":
       i += 1; move(rfind($query[i])+1)
+      blockEnd()
     of "d":
-      i += 1;
+      i += 1
       case $query[i]:
       of "0":
         deleteBackward(pos($query[i]))
+        blockEnd()
       of "l", "W":
         deleteTill(pos($query[i]))
+        blockEnd()
       of "E", "$", "]":
         deleteForward(pos($query[i]))
+        blockEnd()
       of "^":
         let head = getHead()
         if cursor < head:
           deleteTill(head)
         else:
           deleteBackward(head)
+        blockEnd()
       else:
         unsupportedError($query[i])
     else:
       unsupportedError($query[i])
     i += 1
-  #stderr.writeline(cursor) #debug
+  stderr.writeline(cursor) #debug
   echo line
 
