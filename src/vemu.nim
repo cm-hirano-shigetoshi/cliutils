@@ -92,7 +92,6 @@ proc pos(q: string): int =
     return getW()
   if q == "B":
     return getB()
-  stderr.writeline("Unsupported char: ", q)
 
 proc find(c: string): int =
   return line.find(c, cursor+1)
@@ -119,6 +118,10 @@ proc deleteTill(p: int) =
 proc deleteBackward(p: int) =
   line = line[cursor .. line.len-1]
 
+proc unsupportedError(q: string) =
+  stderr.writeline("[Error] Unsupported char: ", q)
+  quit(1)
+
 
 let query = args[0]; args.delete(0)
 for orig_line in readLinesFromFileOrStdin(args):
@@ -126,8 +129,7 @@ for orig_line in readLinesFromFileOrStdin(args):
   cursor = 0
   var i = 0
   while i < query.len:
-    #stderr.write(cursor, ": ")
-    #stderr.writeline(query[i..query.len])
+    #stderr.writeline(cursor, ": ", query[i..query.len]) #debug
     #[ 1command ]#
     case $query[i]
     of "0", "^", "$", "]", "h", "l", "E", "W", "B":
@@ -159,10 +161,11 @@ for orig_line in readLinesFromFileOrStdin(args):
           deleteTill(head)
         else:
           deleteBackward(head)
+      else:
+        unsupportedError($query[i])
     else:
-      echo "ERROR"
-      quit(1)
+      unsupportedError($query[i])
     i += 1
-  #stderr.writeline(cursor)
+  #stderr.writeline(cursor) #debug
   echo line
 
