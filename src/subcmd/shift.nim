@@ -65,8 +65,11 @@ proc shift*(tmpArgs: openArray[string]) =
       for m in line.findIter(d):
         s = m.matchBounds.a
         if i >= n:
+          i = -1
           break
         i += 1
+      if i >= 0 and n >= i:
+        return ""
       return line[s .. line.len-1]
     else:
       var e = -1
