@@ -44,7 +44,6 @@ proc island*(tmpArgs: openArray[string]) =
       args.add(":")
 
   let query = args[0]; args.delete(0)
-
   proc getLine(line: string): string =
     let matches = line.findAll(re"\S+")
     var s = ""

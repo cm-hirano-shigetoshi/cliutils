@@ -45,55 +45,60 @@ proc addModulo(num: int, modulo: int) =
         Indices.add(i-1)
 
 proc addEach(query: string) =
-  for i in query.split(re"[,\s]+"):
-    Indices.add(i.parseInt.toIndex)
+  for i in query.split(","):
+    if i.len > 0:
+      Indices.add(i.parseInt.toIndex)
 
-proc getRange*(query: string, length: int, zero: bool): seq[int] =
+proc getRange*(q: string, length: int, zero: bool): seq[int] =
   Length = length;
   Zero = zero
   Indices = @[]
 
   var m: Option[RegexMatch]
-  if query == ":" or query == "..":
-    addAll()
-    return Indices
-  m = query.match(re"^-?[0-9]+$"); if m != none(RegexMatch):
-    addExactNumber(query.parseInt)
-    return Indices
-  m = query.match(re"^(-?[0-9]+)(:|\.\.)$"); if m != none(RegexMatch):
-    let first  = m.get.captures[0].parseInt
-    addFrom(first)
-    return Indices
-  m = query.match(re"^(:|\.\.)(-?[0-9]+)$"); if m != none(RegexMatch):
-    let op = m.get.captures[0]
-    let second  = m.get.captures[1].parseInt
-    if op == ":":
-      addUntil(second-1)
-    elif op == "..":
-      addUntil(second)
-    return Indices
-  m = query.match(re"^(-?[0-9]+)(:|\.\.)(-?[0-9]+)$"); if m != none(RegexMatch):
-    let op = m.get.captures[1]
-    let first  = m.get.captures[0].parseInt
-    let second = m.get.captures[2].parseInt
-    if op == ":":
-      if second == 0:
-        addFromtTo(first, 0)
-      else:
-        addFromtTo(first, second-1)
-    elif op == "..":
-      addFromtTo(first, second)
-    return Indices
-  m = query.match(re"^%([0-9]+)$"); if m != none(RegexMatch):
-    let first  = m.get.captures[0].parseInt
-    addModulo(first, 0)
-    return Indices
-  m = query.match(re"^%([0-9]+)==?([0-9]+)$"); if m != none(RegexMatch):
-    let first  = m.get.captures[0].parseInt
-    let second = m.get.captures[1].parseInt
-    addModulo(first, second)
-    return Indices
-  m = query.match(re"^[\s-0-9]+$"); if m != none(RegexMatch):
-    addEach(query)
-    return Indices
+  for query in q.split(","):
+    m = query.match(re"^-?\d+$"); if m != none(RegexMatch):
+      addEach(query)
+      continue
+    if query == ":" or query == "..":
+      addAll()
+      continue
+    m = query.match(re"^(-?[0-9]+)(:|\.\.)$"); if m != none(RegexMatch):
+      # 2..
+      let first  = m.get.captures[0].parseInt
+      addFrom(first)
+      continue
+    m = query.match(re"^(:|\.\.)(-?[0-9]+)$"); if m != none(RegexMatch):
+      # ..2
+      let op = m.get.captures[0]
+      let second  = m.get.captures[1].parseInt
+      if op == ":":
+        addUntil(second-1)
+      elif op == "..":
+        addUntil(second)
+      continue
+    m = query.match(re"^(-?[0-9]+)(:|\.\.)(-?[0-9]+)$"); if m != none(RegexMatch):
+      # 2..5
+      let op = m.get.captures[1]
+      let first  = m.get.captures[0].parseInt
+      let second = m.get.captures[2].parseInt
+      if op == ":":
+        if second == 0:
+          addFromtTo(first, 0)
+        else:
+          addFromtTo(first, second-1)
+      elif op == "..":
+        addFromtTo(first, second)
+      continue
+    m = query.match(re"^%([0-9]+)$"); if m != none(RegexMatch):
+      # %2
+      let first  = m.get.captures[0].parseInt
+      addModulo(first, 0)
+      continue
+    m = query.match(re"^%([0-9]+)==?([0-9]+)$"); if m != none(RegexMatch):
+      # %2=0
+      let first  = m.get.captures[0].parseInt
+      let second = m.get.captures[1].parseInt
+      addModulo(first, second)
+      continue
+  return Indices
 
