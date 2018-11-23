@@ -1,4 +1,4 @@
-import strutils, tables, parseopt, sets, nre
+import strutils, tables, parseopt, nre
 import ../lib/table, ../lib/io, ../lib/range
 
 proc island*(tmpArgs: openArray[string]) =
@@ -6,13 +6,13 @@ proc island*(tmpArgs: openArray[string]) =
     let s = """
   Usage: island [OPTION]... PATTERN [FILE]
     -0      : index starts with 0.
-    -d <str>: delimiter; default="\s".
+    -j=<str>: string with which join.
 """
     stdout.write s
 
   var args: seq[string] = @[]
-  var delimiter = "\\s"
   var zero = false
+  var join = "\t"
 
   var minusEvacuatedArgs: seq[string] = @[]
   for a in tmpArgs:
@@ -32,8 +32,8 @@ proc island*(tmpArgs: openArray[string]) =
             args.add(key)
         elif kind == cmdShortOption and key == "0":
           zero = true
-        elif (kind == cmdShortOption and key == "d"):
-          delimiter = val
+        elif kind == cmdShortOption and key == "j":
+          join = val
         else:
           usage()
           quit(0)
@@ -44,10 +44,15 @@ proc island*(tmpArgs: openArray[string]) =
       args.add(":")
 
   let query = args[0]; args.delete(0)
-  for line in readLinesFromFileOrStdin(args):
-    let split = line.split(re(delimiter))
-    var s = ""
-    for i in getRange(query, split.len, zero):
-      s &= split[i] & "\t"
-    echo(s[0..s.len-2])
 
+  proc getLine(line: string): string =
+    let matches = line.findAll(re"\S+")
+    var s = ""
+    for i in getRange(query, matches.len, zero):
+      if s.len > 0:
+        s &= join
+      s &= matches[i]
+    return s
+
+  for line in readLinesFromFileOrStdin(args):
+    echo getLine(line)
