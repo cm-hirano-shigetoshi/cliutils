@@ -77,10 +77,10 @@ proc pop*(tmpArgs: openArray[string]) =
         matches.add(m)
       if matches.len == 0:
         return ""
-      if n > matches.len:
+      if n >= matches.len:
         return line
-      for i in countdown(matches.len-1, matches.len-n):
-        s = matches[i].matchBounds.a
+      for i in countdown(matches.len-1, matches.len-n-1):
+        s = matches[i].matchBounds.b + 1
       return line[s .. line.len-1]
 
   for line in readLinesFromFileOrStdin(args):

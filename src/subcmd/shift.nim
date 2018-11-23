@@ -59,21 +59,7 @@ proc shift*(tmpArgs: openArray[string]) =
   let d = setDelimiter()
 
   proc getLine(line: string): string =
-    if inverse:
-      var (s, e) = (-1, -1)
-      var i = 0
-      for m in line.findIter(d):
-        if s < 0:
-          s = m.matchBounds.a
-        e = m.matchBounds.b
-        i += 1
-        if i >= n:
-          break
-      if s < 0:
-        return ""
-      else:
-        return line[s .. e]
-    else:
+    if not inverse:
       var s = 0
       var i = 0
       for m in line.findIter(d):
@@ -81,7 +67,18 @@ proc shift*(tmpArgs: openArray[string]) =
         if i >= n:
           break
         i += 1
-      return line[s .. line.len]
+      return line[s .. line.len-1]
+    else:
+      var e = -1
+      var i = 0
+      for m in line.findIter(d):
+        e = m.matchBounds.a - 1
+        if i >= n:
+          break
+        i += 1
+      if n >= i:
+        return line
+      return line[0 .. e]
 
   for line in readLinesFromFileOrStdin(args):
     echo getLine(line)
