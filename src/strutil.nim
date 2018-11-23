@@ -10,6 +10,7 @@ import subcmd/unique
 import subcmd/line
 import subcmd/column
 import subcmd/island
+import subcmd/shift
 import subcmd/count
 
 proc usage() =
@@ -24,8 +25,9 @@ Usage: strutil <COMMAND> [OPTIONS]... [FILE]
   replace    : ordinary replace method.
   unique     : unique lines with original order.
   line       : select lines.
-  column     : select columns.
+  column     : select columns from table.
   island     : select islands.
+  shift      : shift first island.
   count      : count specified string for each line.
 """
   stdout.writeline(s)
@@ -43,6 +45,7 @@ proc run(cmd: string) =
   elif cmd == "line"       :line       (os.commandLineParams()[1..os.commandLineParams().len-1])
   elif cmd == "column"     :column     (os.commandLineParams()[1..os.commandLineParams().len-1])
   elif cmd == "island"     :island     (os.commandLineParams()[1..os.commandLineParams().len-1])
+  elif cmd == "shift"      :shift      (os.commandLineParams()[1..os.commandLineParams().len-1])
   elif cmd == "count"      :count      (os.commandLineParams()[1..os.commandLineParams().len-1])
 
 if paramCount() == 0:
