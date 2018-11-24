@@ -37,19 +37,50 @@ method get*(this: Target, line: EditLine): int {.base.} =
   elif this.s.len == 2:
     case $this.s[0]
     of "f":
-      return max(line.cursor + line.line[line.cursor+1 .. line.line.len-1].find(this.s[1])+1, line.cursor)
+      let p = line.line[line.cursor+1 .. line.line.len-1].find(this.s[1])
+      if p < 0:
+        return -1
+      else:
+        return line.cursor+1 + p
     of "t":
-      return max(line.cursor + line.line[line.cursor+1 .. line.line.len-1].find(this.s[1]), line.cursor)
+      let p = line.line[line.cursor+1 .. line.line.len-1].find(this.s[1])
+      if p < 0:
+        return -1
+      else:
+        return line.cursor+1 + p - 1
     of "F":
       let p = line.line[0 .. line.cursor-1].rfind(this.s[1])
       if p < 0:
-        return line.cursor
+        return -1
       else:
         return p
     of "T":
       let p = line.line[0 .. line.cursor-1].rfind(this.s[1])
       if p < 0:
-        return line.cursor
+        return -1
       else:
         return p + 1
 
+method getForRange*(this: Target, line: EditLine): int {.base.} =
+  if this.s.len == 1:
+    case $this.s[0]
+    of "E":
+      return get(this, line) + 1
+    else:
+      let p = get(this, line)
+      if p == 0:
+        return p
+      elif p == line.line.len-1:
+        return p + 1
+      else:
+        return p
+  elif this.s.len == 2:
+    case $this.s[0]
+    of "f", "t":
+      let p = get(this, line)
+      if p < 0:
+        return -1
+      else:
+        return p + 1
+    else:
+      return get(this, line)
