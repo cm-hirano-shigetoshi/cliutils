@@ -17,6 +17,10 @@ method parseQuery*(this: Vimu, query: string) {.base.} =
       this.operations.add(Move(target:Target(s: $query[i])))
     of "x":
       this.operations.add(Delete(target:Target(s:"l")))
+    #[ 2 commands ]#
+    of "f", "t", "F", "T":
+      this.operations.add(Move(target:Target(s:query[i..i+1])))
+      i += 1
     i += 1
 proc initVimu*(query: string): Vimu =
   var this: Vimu = Vimu()
