@@ -6,7 +6,7 @@ method exec*(this: Vimu, line: string): string {.base.} =
   var line = EditLine(line:line, cursor:0)
   for i in 0 .. this.operations.len-1:
     this.operations[i].apply(line)
-    echo line.line, "(", line.cursor, ")"
+    stderr.writeline(line.line, "(", line.cursor, ")")
   return line.line
 method parseQuery*(this: Vimu, query: string) {.base.} =
   var i = 0

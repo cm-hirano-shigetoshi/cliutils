@@ -1,7 +1,10 @@
 import lib/vimu/Core
 
-var line = " abcd efghi  j klmno pqrst uvwxy z  "
-let query = "$W0$^llhxxxx"
+#           01234567890123456789012345678901234
+var line = " abcd fghi  j klmno pqrst uvwxy z  "
+let query = "]BBBBBBBBBBBBBBB"
 var vimu = initVimu(query)
+echo "01234567890123456789012345678901234"
 echo vimu.exec(line)
 
+# abcd fghi  j klmno pqrst uvwxy z  
