@@ -1,7 +1,7 @@
-import Operation, Target, EditLine
+import Operation, EditLine, Target
 
 type Move* = ref object of Operation
-  target*: Target
+
 method apply*(this: Move, line: EditLine) =
   let p = this.target.get(line)
   if p >= 0:

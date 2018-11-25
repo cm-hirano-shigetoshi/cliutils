@@ -1,6 +1,7 @@
-import EditLine
+import EditLine, Target
 
 type Operation* = ref object of RootObj
-  repeat: int
+  target*: Target
+
 method apply*(this: Operation, line: EditLine) {.base.} = discard
 

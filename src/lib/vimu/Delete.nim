@@ -1,7 +1,7 @@
 import Operation, EditLine, Target
 
 type Delete* = ref object of Operation
-  target*: Target
+
 method apply*(this: Delete, line: EditLine) =
   let p = this.target.getForRange(line)
   if p >= 0:

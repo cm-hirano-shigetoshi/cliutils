@@ -14,21 +14,32 @@ method exec*(this: Vimu, line: string): string {.base.} =
 method parseQuery*(this: Vimu, query: string) {.base.} =
   var i = 0
   var prevAction: Operation = nil
+  var prevActionN: int = 1
   while i < query.len:
     #[ Parse number ]#
-    var repeat1 = 1
+    var repeat1 = -1
     block:
       let m = query[i..query.len-1].match(re"[1-9]\d*")
       if m.isSome:
         repeat1 = parseInt($m.get)
         i += len($m.get)
 
-    #[ Direct command ]#
+    #[ Dot command ]#
     if $query[i] == ".":
       if prevAction != nil:
-        this.operations.add(prevAction)
+        if repeat1 < 0:
+          for x in 1 .. prevActionN:
+            this.operations.add(prevAction)
+        else:
+          for x in 1 .. repeat1:
+            this.operations.add(prevAction)
       i += 1
       continue
+
+    if repeat1 == -1:
+      repeat1 = 1
+
+    #[ Direct command ]#
     if $query[i] == "D":
       this.operations.add(Delete(target: Target(s: "$")))
       i += 1
@@ -69,14 +80,15 @@ method parseQuery*(this: Vimu, query: string) {.base.} =
       stderr.writeLine("[ERROR] Unsupported char: ", $query[i])
       quit(1)
     if mode == 0:
+      let move = Move(target: target)
       for n in 1 .. repeat1*repeat2:
-        this.operations.add(Move(target: target))
+        this.operations.add(move)
     elif mode == 1:
-
+      let action = Delete(target: target)
       for n in 1 .. repeat1*repeat2:
-        let action = Delete(target: target)
         this.operations.add(action)
-        prevAction = action
+      prevAction = action
+      prevActionN = repeat1*repeat2
     i += 1
 
 proc initVimu*(query: string): Vimu =
