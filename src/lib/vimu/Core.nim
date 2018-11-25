@@ -13,6 +13,7 @@ method exec*(this: Vimu, line: string): string {.base.} =
 
 method parseQuery*(this: Vimu, query: string) {.base.} =
   var i = 0
+  var prevAction: Operation = nil
   while i < query.len:
     #[ Parse number ]#
     var repeat1 = 1
@@ -23,6 +24,11 @@ method parseQuery*(this: Vimu, query: string) {.base.} =
         i += len($m.get)
 
     #[ Direct command ]#
+    if $query[i] == ".":
+      if prevAction != nil:
+        this.operations.add(prevAction)
+      i += 1
+      continue
     if $query[i] == "D":
       this.operations.add(Delete(target: Target(s: "$")))
       i += 1
@@ -66,8 +72,11 @@ method parseQuery*(this: Vimu, query: string) {.base.} =
       for n in 1 .. repeat1*repeat2:
         this.operations.add(Move(target: target))
     elif mode == 1:
+
       for n in 1 .. repeat1*repeat2:
-        this.operations.add(Delete(target: target))
+        let action = Delete(target: target)
+        this.operations.add(action)
+        prevAction = action
     i += 1
 
 proc initVimu*(query: string): Vimu =
