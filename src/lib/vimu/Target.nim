@@ -21,19 +21,25 @@ method get*(this: Target, line: EditLine): int {.base.} =
     of "h":
       return max(line.cursor-this.n, 0)
     of "W":
-      for n in 1 .. this.n:
-        for m in line.line[line.cursor .. line.line.len-1].findIter(re"\c+"):
+      var i = 0
+      for m in line.line[line.cursor .. line.line.len-1].findIter(re"\s+"):
+        i += 1
+        if i >= this.n:
           return min(line.cursor + m.matchBounds.b + 1, line.line.len-1)
       return line.line.len-1
     of "B":
-      var start = 0
-      for n in 1 .. this.n:
-        for m in line.line[0 .. line.cursor-1].findIter(re"\S+"):
-          start = m.matchBounds.a
-      return start
+      var starts: seq[int] = @[]
+      for m in line.line[0 .. line.cursor-1].findIter(re"\S+"):
+        starts.add(m.matchBounds.a)
+      if starts.len == 0:
+        return 0
+      else:
+        return starts[starts.len - this.n]
     of "E":
-      for n in 1 .. this.n:
-        for m in line.line[line.cursor+1 .. line.line.len-1].findIter(re"\S+"):
+      var i = 0
+      for m in line.line[line.cursor+1 .. line.line.len-1].findIter(re"\S+"):
+        i += 1
+        if i >= this.n:
           return min(line.cursor+1 + m.matchBounds.b, line.line.len-1)
       return line.line.len-1
     else:
