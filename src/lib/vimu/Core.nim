@@ -13,8 +13,6 @@ method exec*(this: Vimu, line: string): string {.base.} =
 
 method parseQuery*(this: Vimu, query: string) {.base.} =
   var i = 0
-  var prevAction: Operation = nil
-  var prevActionN: int = 1
   while i < query.len:
     #[ Parse number ]#
     var repeat1 = -1
@@ -25,6 +23,7 @@ method parseQuery*(this: Vimu, query: string) {.base.} =
         i += len($m.get)
 
     #[ Dot command ]#
+    #[
     if $query[i] == ".":
       if prevAction != nil:
         if repeat1 < 0:
@@ -35,18 +34,18 @@ method parseQuery*(this: Vimu, query: string) {.base.} =
             this.operations.add(prevAction)
       i += 1
       continue
+    ]#
 
     if repeat1 == -1:
       repeat1 = 1
 
     #[ Direct command ]#
     if $query[i] == "D":
-      this.operations.add(Delete(target: Target(s: "$")))
+      this.operations.add(Delete(target: Target(c: "$")))
       i += 1
       continue
     elif $query[i] == "x":
-      for x in 1 .. repeat1:
-        this.operations.add(Delete(target: Target(s: "l")))
+      this.operations.add(Delete(target: Target(c: "l", n: repeat1)))
       i += 1
       continue
 
@@ -64,31 +63,27 @@ method parseQuery*(this: Vimu, query: string) {.base.} =
         repeat2 = parseInt($m.get)
         i += len($m.get)
 
+    let repeat = repeat1 * repeat2
+
     #[ Parse target ]#
     var target: Target
     case $query[i]
-    of "h", "l", "W", "B", "E", "0", "^", "$", "]":
-      target = Target(s: $query[i])
+    of "0", "^", "$", "]":
+      target = Target(c: $query[i])
+    of "h", "l", "W", "B", "E":
+      target = Target(c: $query[i], n: repeat)
     of "f", "t", "F", "T":
-      if repeat1 == 1 or repeat2 == 1:
-        target = Target(s:query[i..i+1])
-        i += 1
-      else:
-        i += 2
-        continue
+      target = Target(c: query[i..i+1], n: repeat)
+      i += 1
     else:
       stderr.writeLine("[ERROR] Unsupported char: ", $query[i])
       quit(1)
     if mode == 0:
       let move = Move(target: target)
-      for n in 1 .. repeat1*repeat2:
-        this.operations.add(move)
+      this.operations.add(move)
     elif mode == 1:
       let action = Delete(target: target)
-      for n in 1 .. repeat1*repeat2:
-        this.operations.add(action)
-      prevAction = action
-      prevActionN = repeat1*repeat2
+      this.operations.add(action)
     i += 1
 
 proc initVimu*(query: string): Vimu =
