@@ -45,7 +45,7 @@ method parseQuery*(this: Vimu, query: string) {.base.} =
       i += 1
       continue
     elif $query[i] == "x":
-      this.operations.add(Delete(target: Target(c: "l", n: repeat1)))
+      this.operations.add(Delete(target: Target(c: "l"), repeat: repeat1))
       i += 1
       continue
 
@@ -68,21 +68,19 @@ method parseQuery*(this: Vimu, query: string) {.base.} =
     #[ Parse target ]#
     var target: Target
     case $query[i]
-    of "0", "^", "$", "]":
+    of "0", "^", "$", "]", "h", "l", "W", "B", "E":
       target = Target(c: $query[i])
-    of "h", "l", "W", "B", "E":
-      target = Target(c: $query[i], n: repeat)
     of "f", "t", "F", "T":
-      target = Target(c: query[i..i+1], n: repeat)
+      target = Target(c: query[i..i+1])
       i += 1
     else:
       stderr.writeLine("[ERROR] Unsupported char: ", $query[i])
       quit(1)
     if mode == 0:
-      let move = Move(target: target)
+      let move = Move(target: target, repeat: repeat)
       this.operations.add(move)
     elif mode == 1:
-      let action = Delete(target: target)
+      let action = Delete(target: target, repeat: repeat)
       this.operations.add(action)
     i += 1
 
