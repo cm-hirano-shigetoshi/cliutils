@@ -1,15 +1,15 @@
 import nre, strutils
-import Operation, EditLine, Move, Target, Delete
+import Operation, EditingState, Move, Target, Delete
 
 type Vimu* = ref object of RootObj
   operations: seq[Operation]
 
 method exec*(this: Vimu, line: string): string {.base.} =
-  var line = EditLine(line:line, cursor:0)
+  var edit = EditingState(text:line, cursor:0)
   for i in 0 .. this.operations.len-1:
-    this.operations[i].apply(line)
-    #stderr.writeline(line.line, "(", line.cursor, ")") #debug
-  return line.line
+    this.operations[i].apply(edit)
+    #stderr.writeline(edit.text, "(", edit.cursor, ")") #debug
+  return edit.text
 
 method parseQuery*(this: Vimu, query: string) {.base.} =
   var i = 0

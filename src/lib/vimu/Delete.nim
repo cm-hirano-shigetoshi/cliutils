@@ -1,16 +1,16 @@
-import Action, EditLine, Target
+import Action, EditingState, Target
 
 type Delete* = ref object of Action
 
-method apply*(this: Delete, line: EditLine, n: int) =
-  let p = this.target.getForRange(line, n)
+method apply*(this: Delete, edit: EditingState, n: int) =
+  let p = this.target.getForRange(edit, n)
   if p >= 0:
-    if p > line.cursor:
-      line.line = line.line[0 .. line.cursor-1] & line.line[p .. line.line.len-1]
-    elif p < line.cursor:
-      line.line = line.line[0 .. p-1] & line.line[line.cursor .. line.line.len-1]
-      line.cursor = p
+    if p > edit.cursor:
+      edit.text = edit.text[0 .. edit.cursor-1] & edit.text[p .. edit.text.len-1]
+    elif p < edit.cursor:
+      edit.text = edit.text[0 .. p-1] & edit.text[edit.cursor .. edit.text.len-1]
+      edit.cursor = p
 
-method apply*(this: Delete, line: EditLine) =
-  this.apply(line, this.repeat)
+method apply*(this: Delete, edit: EditingState) =
+  this.apply(edit, this.repeat)
 
