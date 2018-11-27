@@ -1,6 +1,6 @@
-import Operation, EditLine, Target
+import Action, EditLine, Target
 
-type Delete* = ref object of Operation
+type Delete* = ref object of Action
 
 method apply*(this: Delete, line: EditLine, n: int) =
   let p = this.target.getForRange(line, n)
