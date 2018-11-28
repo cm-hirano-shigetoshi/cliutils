@@ -1,15 +1,22 @@
 import nre, strutils
-import Operation, EditLine, Move, Target, Delete
+import Operation, EditingState, Move, Action, Target, Delete
+
+include RepeatAction
 
 type Vimu* = ref object of RootObj
   operations: seq[Operation]
 
 method exec*(this: Vimu, line: string): string {.base.} =
-  var line = EditLine(line:line, cursor:0)
+  var edit = EditingState(text:line, cursor:0)
   for i in 0 .. this.operations.len-1:
-    this.operations[i].apply(line)
-    #stderr.writeline(line.line, "(", line.cursor, ")") #debug
-  return line.line
+    let success = this.operations[i].apply(edit)
+    if success == 1:
+      let action = cast[Action](this.operations[i])
+      for j in i+1 .. this.operations.len-1:
+        if this.operations[j] of RepeatAction:
+          cast[RepeatAction](this.operations[j]).setAction(action)
+    #stderr.writeline(edit.text, "(", edit.cursor, ")") #debug
+  return edit.text
 
 method parseQuery*(this: Vimu, query: string) {.base.} =
   var i = 0
@@ -23,18 +30,10 @@ method parseQuery*(this: Vimu, query: string) {.base.} =
         i += len($m.get)
 
     #[ Dot command ]#
-    #[
     if $query[i] == ".":
-      if prevAction != nil:
-        if repeat1 < 0:
-          for x in 1 .. prevActionN:
-            this.operations.add(prevAction)
-        else:
-          for x in 1 .. repeat1:
-            this.operations.add(prevAction)
+      this.operations.add(RepeatAction(repeat: repeat1))
       i += 1
       continue
-    ]#
 
     if repeat1 == -1:
       repeat1 = 1

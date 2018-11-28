@@ -1,8 +1,8 @@
-import Operation, EditLine, Target
+import Operation, EditingState, Target
 
 type Action* = ref object of Operation
 
-method apply*(this: Operation, line: EditLine, n: int) = discard
+method apply*(this: Action, edit: EditingState, n: int): int = discard
 
-method apply*(this: Operation, line: EditLine) = discard
+method apply*(this: Action, edit: EditingState): int = discard
 
