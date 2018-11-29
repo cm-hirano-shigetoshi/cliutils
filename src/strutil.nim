@@ -13,6 +13,7 @@ import subcmd/island
 import subcmd/shift
 import subcmd/pop
 import subcmd/count
+import subcmd/preg
 
 proc usage() =
   let s = """
@@ -31,6 +32,7 @@ Usage: strutil <COMMAND> [OPTIONS]... [FILE]
   shift      : shift first island.
   pop        : pop last island.
   count      : count specified string for each line.
+  preg       : print lines match with input.
 """
   stdout.writeline(s)
 
@@ -50,6 +52,7 @@ proc run(cmd: string) =
   elif cmd == "shift"      :shift      (os.commandLineParams()[1..os.commandLineParams().len-1])
   elif cmd == "pop"        :pop        (os.commandLineParams()[1..os.commandLineParams().len-1])
   elif cmd == "count"      :count      (os.commandLineParams()[1..os.commandLineParams().len-1])
+  elif cmd == "preg"       :preg       (os.commandLineParams()[1..os.commandLineParams().len-1])
 
 if paramCount() == 0:
   usage()
