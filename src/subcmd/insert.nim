@@ -45,13 +45,13 @@ proc insert*(tmpArgs: openArray[string]) =
       usage()
       quit(1)
 
-  if str_i.len + str_a.len + str_0.len + str_ci.len + str_ca.len + str_o.len + str_co.len== 0:
+  if str_i.len + str_a.len + str_0.len + str_ci.len + str_ca.len + str_o.len + str_co.len == 0:
     for line in readLinesFromFileOrStdin(args):
       echo line
     quit(0)
 
   let query = args[0]; args.delete(0)
-  stderr.writeln("query = \"", query, "\"")
+  #stderr.writeline("query = \"", query, "\"") #debug
 
   for line in readLinesFromFileOrStdin(args):
     var l = line

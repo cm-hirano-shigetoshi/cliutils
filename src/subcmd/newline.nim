@@ -46,7 +46,7 @@ proc newline*(tmpArgs: openArray[string]) =
     str = str.replace(re"\s+$","")
     for i in 1 .. trailN:
       str &= "\n"
-  if subst != nil:
+  if subst.len > 0:
     subst = subst.replace(re"([^\\])\\n", "\1\n")
     str = str.replace("\n",subst)
   stdout.write str.replace("\r","\\r")

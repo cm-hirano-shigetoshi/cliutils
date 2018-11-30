@@ -19,9 +19,6 @@ proc addAll() =
   for n in 0 .. Length-1:
     Indices.add(n)
 
-proc addExactNumber(n: int) =
-  Indices.add(n.toIndex)
-
 proc addFrom(start: int) =
   for n in start.toIndex .. Length-1:
     Indices.add(n)
