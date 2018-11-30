@@ -2,6 +2,7 @@ import strutils, nre, os
 import subcmd/transpose
 import subcmd/newline
 import subcmd/replace
+import subcmd/insert
 import subcmd/unique
 import subcmd/line
 import subcmd/column
@@ -17,6 +18,7 @@ Usage: strutil <COMMAND> [OPTIONS]... [FILE]
   transpose  : transposed text from table.
   newline    : editor for \n.
   replace    : ordinary replace method.
+  insert     : insert strings to lines which match a query.
   unique     : unique lines with original order.
   line       : select lines.
   column     : select columns from table.
@@ -33,6 +35,7 @@ proc run(cmd: string) =
   elif cmd == "transpose"  :transpose  (os.commandLineParams()[1..os.commandLineParams().len-1])
   elif cmd == "newline"    :newline    (os.commandLineParams()[1..os.commandLineParams().len-1])
   elif cmd == "replace"    :replace    (os.commandLineParams()[1..os.commandLineParams().len-1])
+  elif cmd == "insert"     :insert     (os.commandLineParams()[1..os.commandLineParams().len-1])
   elif cmd == "unique"     :unique     (os.commandLineParams()[1..os.commandLineParams().len-1])
   elif cmd == "line"       :line       (os.commandLineParams()[1..os.commandLineParams().len-1])
   elif cmd == "column"     :column     (os.commandLineParams()[1..os.commandLineParams().len-1])
