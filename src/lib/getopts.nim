@@ -17,13 +17,23 @@ for a in os.commandLineParams():
   else:
     tmp_args.add(a)
 
+var shift = 0
+proc shift_arg*(n: int) =
+  shift += n
+proc shift_arg*() =
+  shift_arg(1)
+
 iterator getopts*(): tuple[kind: CmdLineKind, key, val: TaintedString] =
   var p = initOptParser(tmp_args)
+  var i = 0
   for kind, key, val in getopt(p):
     #stderr.writeline("key=\"", key, "\" val=\"", val, "\"") #debug
+    i += 1
+    if i <= shift:
+      continue
     if $key[0] == "":
       yield (kind, key[1..key.len-1], val)
-    if $val[0] == "":
+    elif $val[0] == "":
       yield (kind, key, val[1..val.len-1])
     else:
       yield (kind, key, val)

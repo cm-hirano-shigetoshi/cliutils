@@ -1,6 +1,8 @@
 import strutils
 import getopts
 
+shift_arg()
+
 var args: seq[string] = @[]
 var bbb = ""
 for kind, key, val in getopts():
