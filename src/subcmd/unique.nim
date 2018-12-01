@@ -1,7 +1,8 @@
-import strutils, sets, tables, parseopt, nre, algorithm
-import ../lib/io
+import strutils, sets, tables, nre, algorithm
+import ../lib/io, ../lib/getopts
 
-proc unique*(tmpArgs: openArray[string]) =
+proc unique*() =
+  shift_arg()
   proc usage() =
     let s = """
   Usage: line [OPTION]... [FILE]
@@ -14,22 +15,16 @@ proc unique*(tmpArgs: openArray[string]) =
   var forward = true
   var skipN = 0
 
-  if tmpArgs.len > 0:
-    try:
-      var p = initOptParser(@tmpArgs)
-      for kind, key, val in getopt(p):
-        if kind == cmdArgument:
-          args.add(key)
-        elif kind == cmdShortOption and key == "b":
-          forward = false
-        elif kind == cmdShortOption and key == "f":
-          skipN = val.parseInt
-        else:
-          usage()
-          quit(0)
-    except:
+  for kind, key, val in getopts():
+    if kind == cmdArgument:
+      args.add(key)
+    elif kind == cmdShortOption and key == "b":
+      forward = false
+    elif kind == cmdShortOption and key == "f":
+      skipN = val.parseInt
+    else:
       usage()
-      quit(1)
+      quit(0)
 
   proc skipFields(line: string): string =
     result = line

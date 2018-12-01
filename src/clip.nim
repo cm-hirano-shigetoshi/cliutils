@@ -1,5 +1,5 @@
-import strutils, parseopt, nre
-import lib/io, lib/cmd
+import strutils, nre
+import lib/io, lib/cmd, lib/getopts
 
 var args: seq[string] = @[]
 var host = "localhost"

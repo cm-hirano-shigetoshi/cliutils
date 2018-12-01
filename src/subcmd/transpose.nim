@@ -1,7 +1,8 @@
-import strutils, tables, parseopt, sets, nre
-import ../lib/table, ../lib/io
+import strutils, tables, sets, nre
+import ../lib/table, ../lib/io, ../lib/getopts
 
-proc transpose*(tmpArray: openArray[string]) =
+proc transpose*() =
+  shift_arg()
   proc usage() =
     let s = """
   Usage: transpose [OPTION]... [FILE]
@@ -16,27 +17,21 @@ proc transpose*(tmpArray: openArray[string]) =
   var delimiter = "\t"
   var regex = false
 
-  if tmpArray.len > 0:
-    try:
-      var p = initOptParser(@tmpArray)
-      for kind, key, val in getopt(p):
-        if kind == cmdArgument:
-          args.add(key)
-        elif (kind == cmdShortOption and key == "d"):
-          delimiter = val
-        elif (kind == cmdShortOption and key == "r"):
-          regex = true
-        elif (kind == cmdShortOption and key == "C"):
-          delimiter = ","
-        elif (kind == cmdShortOption and key == "S"):
-          delimiter = "\\s+"
-          regex = true
-        else:
-          usage()
-          quit(0)
-    except:
+  for kind, key, val in getopts():
+    if kind == cmdArgument:
+      args.add(key)
+    elif (kind == cmdShortOption and key == "d"):
+      delimiter = val
+    elif (kind == cmdShortOption and key == "r"):
+      regex = true
+    elif (kind == cmdShortOption and key == "C"):
+      delimiter = ","
+    elif (kind == cmdShortOption and key == "S"):
+      delimiter = "\\s+"
+      regex = true
+    else:
       usage()
-      quit(1)
+      quit(0)
 
   let lines = readAllFromFileOrStdin(args)
   let data = getMatrix(lines, delimiter, regex)

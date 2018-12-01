@@ -1,7 +1,8 @@
-import strutils, parseopt, nre
-import ../lib/cmd
+import strutils, nre
+import ../lib/cmd, ../lib/getopts
 
-proc find*(tmpArgs: openArray[string]) =
+proc find*() =
+  shift_arg()
   proc usage() =
     let s = """
   Usage: replace [OPTION]... <before> <after> [FILE]
@@ -12,20 +13,14 @@ proc find*(tmpArgs: openArray[string]) =
     stdout.write s
 
   var args: seq[string] = @[]
-  if tmpArgs.len > 0:
-    try:
-      var p = initOptParser(@tmpArgs)
-      for kind, key, val in getopt(p):
-        if kind == cmdArgument:
-          args.add(key)
-        #elif (kind == cmdShortOption and key == "i"):
-          #ignore_case = true
-        else:
-          usage()
-          quit(0)
-    except:
+  for kind, key, val in getopts():
+    if kind == cmdArgument:
+      args.add(key)
+    #elif (kind == cmdShortOption and key == "i"):
+      #ignore_case = true
+    else:
       usage()
-      quit(1)
+      quit(0)
 
   #var ls = startProcess("ls -lR --color=always " & args.join(" ")).split("\n")
   echo startProcess("ls -lR --color=always " & args.join(" "))

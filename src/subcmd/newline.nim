@@ -1,7 +1,8 @@
-import strutils, parseopt, nre
-import ../lib/io
+import strutils, nre
+import ../lib/io, ../lib/getopts
 
-proc newline*(tmpArgs: openArray[string]) =
+proc newline*() =
+  shift_arg()
   proc usage() =
     let s = """
   Usage: newline [OPTION]... [FILE]
@@ -16,26 +17,20 @@ proc newline*(tmpArgs: openArray[string]) =
   var subst: string
   var leadN = -1
   var trailN = -1
-  if tmpArgs.len > 0:
-    try:
-      var p = initOptParser(@tmpArgs)
-      for kind, key, val in getopt(p):
-        if kind == cmdArgument:
-          args.add(key)
-        elif kind == cmdShortOption and key == "r":
-          subst = val
-        elif kind == cmdShortOption and key == "l":
-          leadN = val.parseInt
-        elif kind == cmdShortOption and key == "t":
-          trailN = val.parseInt
-        elif kind == cmdShortOption and key == "z":
-          trailN = 0
-        else:
-          usage()
-          quit(0)
-    except:
+  for kind, key, val in getopts():
+    if kind == cmdArgument:
+      args.add(key)
+    elif kind == cmdShortOption and key == "r":
+      subst = val
+    elif kind == cmdShortOption and key == "l":
+      leadN = val.parseInt
+    elif kind == cmdShortOption and key == "t":
+      trailN = val.parseInt
+    elif kind == cmdShortOption and key == "z":
+      trailN = 0
+    else:
       usage()
-      quit(1)
+      quit(0)
 
   var str = readRawAllFromFileOrStdin(args)
   if leadN >= 0:

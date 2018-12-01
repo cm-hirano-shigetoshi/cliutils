@@ -1,7 +1,8 @@
-import strutils, tables, parseopt, nre, sets
-import ../lib/table, ../lib/io, ../lib/range
+import strutils, tables, nre, sets
+import ../lib/table, ../lib/io, ../lib/range, ../lib/getopts
 
-proc island*(tmpArgs: openArray[string]) =
+proc island*() =
+  shift_arg()
   proc usage() =
     let s = """
   Usage: island [OPTION]... PATTERN [FILE]
@@ -16,34 +17,18 @@ proc island*(tmpArgs: openArray[string]) =
   var join = "\t"
   var inverse = false
 
-  var minusEvacuatedArgs: seq[string] = @[]
-  for a in tmpArgs:
-    if a != "-0" and a.match(re"^-[0-9]") != none(RegexMatch):
-      minusEvacuatedArgs.add("" & a)
+  for kind, key, val in getopts():
+    if kind == cmdArgument:
+      args.add(key)
+    elif kind == cmdShortOption and key == "0":
+      zero = true
+    elif kind == cmdShortOption and key == "j":
+      join = val
+    elif kind == cmdShortOption and key == "v":
+      inverse = true
     else:
-      minusEvacuatedArgs.add(a)
-
-  if minusEvacuatedArgs.len > 0:
-    try:
-      var p = initOptParser(minusEvacuatedArgs)
-      for kind, key, val in getopt(p):
-        if kind == cmdArgument:
-          if key.match(re"^-[0-9]") != none(RegexMatch):
-            args.add(key[1..key.len-1])
-          else:
-            args.add(key)
-        elif kind == cmdShortOption and key == "0":
-          zero = true
-        elif kind == cmdShortOption and key == "j":
-          join = val
-        elif kind == cmdShortOption and key == "v":
-          inverse = true
-        else:
-          usage()
-          quit(0)
-    except:
       usage()
-      quit(1)
+      quit(0)
 
   if args.len < 1:
     args.add(":")

@@ -1,5 +1,4 @@
-import parseopt
-import lib/io
+import lib/io, lib/getopts
 import lib/vimu/Core
 
 proc usage() =
@@ -9,16 +8,12 @@ Usage: vimu <COMMAND> [FILE]
   stdout.writeline(s)
 
 var args: seq[string] = @[]
-try:
-  for kind, key, val in getopt():
-    if kind == cmdArgument:
-      args.add(key)
-    else:
-      usage()
-      quit(0)
-except:
-  usage()
-  quit(1)
+for kind, key, val in getopts():
+  if kind == cmdArgument:
+    args.add(key)
+  else:
+    usage()
+    quit(0)
 
 let query = args[0]; args.delete(0)
 let vimu = initVimu(query)

@@ -1,7 +1,8 @@
-import strutils, parseopt, nre
-import ../lib/io
+import strutils, nre
+import ../lib/io, ../lib/getopts
 
-proc preg*(tmpArgs: openArray[string]) =
+proc preg*() =
+  shift_arg()
   proc usage() =
     let s = """
   Usage: preg [OPTION]... [FILE]
@@ -14,22 +15,16 @@ proc preg*(tmpArgs: openArray[string]) =
   var only_first = false
   var regexp = false
 
-  if tmpArgs.len > 0:
-    try:
-      var p = initOptParser(@tmpArgs)
-      for kind, key, val in getopt(p):
-        if kind == cmdArgument:
-          args.add(key)
-        elif kind == cmdShortOption and key == "1":
-          only_first = true
-        elif kind == cmdShortOption and key == "r":
-          regexp = true
-        else:
-          usage()
-          quit(0)
-    except:
+  for kind, key, val in getopts():
+    if kind == cmdArgument:
+      args.add(key)
+    elif kind == cmdShortOption and key == "1":
+      only_first = true
+    elif kind == cmdShortOption and key == "r":
+      regexp = true
+    else:
       usage()
-      quit(1)
+      quit(0)
 
   let input = args[0]; args.delete(0)
 

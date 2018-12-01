@@ -1,5 +1,5 @@
-import strutils, parseopt, nre, tables, algorithm
-import ../lib/io
+import strutils, nre, tables, algorithm
+import ../lib/io, ../lib/getopts
 
 proc filter(n: int, select :int, cmp: string): bool =
   if cmp == "":
@@ -23,7 +23,8 @@ proc countLine(line: string, query: string): int =
       break
   return n
 
-proc count*(tmpArgs: openArray[string]) =
+proc count*() =
+  shift_arg()
   proc usage() =
     let s = """
   Usage: count [OPTION]... QUERY [FILE]
@@ -38,34 +39,28 @@ proc count*(tmpArgs: openArray[string]) =
   var cmp = ""
   var sort = false
   var reverse = false
-  if tmpArgs.len > 0:
-    try:
-      var p = initOptParser(@tmpArgs)
-      for kind, key, val in getopt(p):
-        if kind == cmdArgument:
-          args.add(key)
-        elif (kind == cmdShortOption and key == "n"):
-          if val.endswith("+"):
-            cmp = "+"
-            select = val[0 .. val.len-2].parseInt
-          elif val.startswith("<"):
-            cmp = "<"
-            select = val[1 .. val.len-1].parseInt
-          elif val.startswith(">"):
-            cmp = ">"
-            select = val[1 .. val.len-1].parseInt
-          else:
-            select = val.parseInt
-        elif (kind == cmdShortOption and key == "s"):
-          sort = true
-        elif (kind == cmdShortOption and key == "r"):
-          reverse = true
-        else:
-          usage()
-          quit(0)
-    except:
+  for kind, key, val in getopts():
+    if kind == cmdArgument:
+      args.add(key)
+    elif (kind == cmdShortOption and key == "n"):
+      if val.endswith("+"):
+        cmp = "+"
+        select = val[0 .. val.len-2].parseInt
+      elif val.startswith("<"):
+        cmp = "<"
+        select = val[1 .. val.len-1].parseInt
+      elif val.startswith(">"):
+        cmp = ">"
+        select = val[1 .. val.len-1].parseInt
+      else:
+        select = val.parseInt
+    elif (kind == cmdShortOption and key == "s"):
+      sort = true
+    elif (kind == cmdShortOption and key == "r"):
+      reverse = true
+    else:
       usage()
-      quit(1)
+      quit(0)
 
   let query = args[0]; args.delete(0)
   if sort:

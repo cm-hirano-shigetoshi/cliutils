@@ -1,7 +1,8 @@
-import strutils, tables, parseopt, sets, nre
-import ../lib/io
+import strutils, tables, sets, nre
+import ../lib/io, ../lib/getopts
 
-proc pop*(tmpArgs: openArray[string]) =
+proc pop*() =
+  shift_arg()
   proc usage() =
     let s = """
   Usage: pop [OPTION]... PATTERN [FILE]
@@ -17,36 +18,23 @@ proc pop*(tmpArgs: openArray[string]) =
   var inverse = false
   var delimiter = 0
 
-  var minusEvacuatedArgs: seq[string] = @[]
-  for a in tmpArgs:
-    if a != "-0" and a.match(re"^-[0-9]") != none(RegexMatch):
-      minusEvacuatedArgs.add("" & a)
+  for kind, key, val in getopts():
+    if kind == cmdArgument:
+      if key.match(re"^-[0-9]") != none(RegexMatch):
+        args.add(key[1..key.len-1])
+      else:
+        args.add(key)
+    elif (kind == cmdShortOption and key == "n"):
+      n = val.parseInt
+    elif (kind == cmdShortOption and key == "v"):
+      inverse = true
+    elif (kind == cmdShortOption and key == "t"):
+      delimiter = 1
+    elif (kind == cmdShortOption and key == "c"):
+      delimiter = 2
     else:
-      minusEvacuatedArgs.add(a)
-
-  if minusEvacuatedArgs.len > 0:
-    try:
-      var p = initOptParser(minusEvacuatedArgs)
-      for kind, key, val in getopt(p):
-        if kind == cmdArgument:
-          if key.match(re"^-[0-9]") != none(RegexMatch):
-            args.add(key[1..key.len-1])
-          else:
-            args.add(key)
-        elif (kind == cmdShortOption and key == "n"):
-          n = val.parseInt
-        elif (kind == cmdShortOption and key == "v"):
-          inverse = true
-        elif (kind == cmdShortOption and key == "t"):
-          delimiter = 1
-        elif (kind == cmdShortOption and key == "c"):
-          delimiter = 2
-        else:
-          usage()
-          quit(0)
-    except:
       usage()
-      quit(1)
+      quit(0)
 
   proc setDelimiter(): Regex =
     if delimiter == 0:

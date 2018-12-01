@@ -1,7 +1,8 @@
-import strutils, tables, parseopt, sets, nre
-import ../lib/table, ../lib/io, ../lib/range
+import strutils, tables, sets, nre
+import ../lib/table, ../lib/io, ../lib/range, ../lib/getopts
 
-proc column*(tmpArgs: openArray[string]) =
+proc column*() =
+  shift_arg()
   proc usage() =
     let s = """
   Usage: column [OPTION]... PATTERN [FILE]
@@ -20,43 +21,27 @@ proc column*(tmpArgs: openArray[string]) =
   var zero = false
   var invert = false
 
-  var minusEvacuatedArgs: seq[string] = @[]
-  for a in tmpArgs:
-    if a != "-0" and a.match(re"^-[0-9]") != none(RegexMatch):
-      minusEvacuatedArgs.add("" & a)
+  for kind, key, val in getopts():
+    if kind == cmdArgument:
+      args.add(key)
+    elif kind == cmdShortOption and key == "0":
+      zero = true
+    elif (kind == cmdShortOption and key == "v") or (kind == cmdLongOption and key == "invert"):
+      invert = true
+    elif (kind == cmdShortOption and key == "d"):
+      delimiter = val
+    elif (kind == cmdShortOption and key == "r"):
+      regex = true
+    elif (kind == cmdShortOption and key == "C"):
+      delimiter = ","
+    elif (kind == cmdShortOption and key == "S"):
+      delimiter = "\\s+"
+      regex = true
     else:
-      minusEvacuatedArgs.add(a)
-
-  if minusEvacuatedArgs.len > 0:
-    try:
-      var p = initOptParser(minusEvacuatedArgs)
-      for kind, key, val in getopt(p):
-        if kind == cmdArgument:
-          if key.match(re"^-[0-9]") != none(RegexMatch):
-            args.add(key[1..key.len-1])
-          else:
-            args.add(key)
-        elif kind == cmdShortOption and key == "0":
-          zero = true
-        elif (kind == cmdShortOption and key == "v") or (kind == cmdLongOption and key == "invert"):
-          invert = true
-        elif (kind == cmdShortOption and key == "d"):
-          delimiter = val
-        elif (kind == cmdShortOption and key == "r"):
-          regex = true
-        elif (kind == cmdShortOption and key == "C"):
-          delimiter = ","
-        elif (kind == cmdShortOption and key == "S"):
-          delimiter = "\\s+"
-          regex = true
-        else:
-          usage()
-          quit(0)
-    except:
       usage()
-      quit(1)
-    if args.len < 1:
-      args.add(":")
+      quit(0)
+  if args.len < 1:
+    args.add(":")
 
   let query = args[0]; args.delete(0)
   let lines = readAllFromFileOrStdin(args)

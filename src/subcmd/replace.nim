@@ -1,7 +1,8 @@
-import strutils, parseopt, nre
-import ../lib/io
+import strutils, nre
+import ../lib/io, ../lib/getopts
 
-proc replace*(tmpArgs: openArray[string]) =
+proc replace*() =
+  shift_arg()
   proc usage() =
     let s = """
   Usage: replace [OPTION]... <before> <after> [FILE]
@@ -15,24 +16,18 @@ proc replace*(tmpArgs: openArray[string]) =
   var ignore_case = false
   var insert = 0
 
-  if tmpArgs.len > 0:
-    try:
-      var p = initOptParser(@tmpArgs)
-      for kind, key, val in getopt(p):
-        if kind == cmdArgument:
-          args.add(key)
-        elif (kind == cmdShortOption and key == "i"):
-          ignore_case = true
-        elif (kind == cmdShortOption and key == "b"):
-          insert = -1
-        elif (kind == cmdShortOption and key == "a"):
-          insert = 1
-        else:
-          usage()
-          quit(0)
-    except:
+  for kind, key, val in getopts():
+    if kind == cmdArgument:
+      args.add(key)
+    elif (kind == cmdShortOption and key == "i"):
+      ignore_case = true
+    elif (kind == cmdShortOption and key == "b"):
+      insert = -1
+    elif (kind == cmdShortOption and key == "a"):
+      insert = 1
+    else:
       usage()
-      quit(1)
+      quit(0)
 
   var before = args[0]; args.delete(0)
   var after  = args[0]; args.delete(0)

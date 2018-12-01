@@ -1,7 +1,8 @@
-import strutils, parseopt, nre
-import ../lib/io
+import strutils, nre
+import ../lib/io, ../lib/getopts
 
-proc insert*(tmpArgs: openArray[string]) =
+proc insert*() =
+  shift_arg()
   proc usage() =
     let s = """
   Usage: insert [OPTION]... <query> [FILE]
@@ -18,32 +19,26 @@ proc insert*(tmpArgs: openArray[string]) =
   var args: seq[string] = @[]
   var str_i, str_a, str_0, str_ci, str_ca, str_o, str_co = ""
 
-  if tmpArgs.len > 0:
-    try:
-      var p = initOptParser(@tmpArgs)
-      for kind, key, val in getopt(p):
-        if kind == cmdArgument:
-          args.add(key)
-        elif (kind == cmdShortOption and key == "i"):
-          str_i = val
-        elif (kind == cmdShortOption and key == "a"):
-          str_a = val
-        elif (kind == cmdShortOption and key == "0"):
-          str_0 = val
-        elif (kind == cmdShortOption and key == "I"):
-          str_ci = val
-        elif (kind == cmdShortOption and key == "A"):
-          str_ca = val
-        elif (kind == cmdShortOption and key == "o"):
-          str_o = val
-        elif (kind == cmdShortOption and key == "O"):
-          str_co = val
-        else:
-          usage()
-          quit(0)
-    except:
+  for kind, key, val in getopts():
+    if kind == cmdArgument:
+      args.add(key)
+    elif (kind == cmdShortOption and key == "i"):
+      str_i = val
+    elif (kind == cmdShortOption and key == "a"):
+      str_a = val
+    elif (kind == cmdShortOption and key == "0"):
+      str_0 = val
+    elif (kind == cmdShortOption and key == "I"):
+      str_ci = val
+    elif (kind == cmdShortOption and key == "A"):
+      str_ca = val
+    elif (kind == cmdShortOption and key == "o"):
+      str_o = val
+    elif (kind == cmdShortOption and key == "O"):
+      str_co = val
+    else:
       usage()
-      quit(1)
+      quit(0)
 
   if str_i.len + str_a.len + str_0.len + str_ci.len + str_ca.len + str_o.len + str_co.len == 0:
     for line in readLinesFromFileOrStdin(args):
