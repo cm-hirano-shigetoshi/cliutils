@@ -52,58 +52,48 @@ proc insert*() =
   let query = args[0]; args.delete(0)
   #stderr.writeline("query = \"", query, "\"") #debug
 
-  for line in readLinesFromFileOrStdin(args):
-    var l = line
-    var found = false
+  proc add_each_pos(line: var string, p: int) =
+    if str_a.len > 0:
+      line = line[0 .. p+query.len-1] & str_a & line[p+query.len .. line.len-1]
+    if str_i.len > 0:
+      line = line[0 .. p-1] & str_i & line[p .. line.len-1]
+
+  proc add_each_line(line: var string) =
+    if str_ca.len > 0:
+      line &= str_ca
+    if str_ci.len > 0:
+      var head = line.len
+      for m in line.findIter(re"\S"):
+        head = m.matchBounds.a
+        break
+      line = line[0 .. head-1] & str_ci & line[head .. line.len-1]
+    if str_0.len > 0:
+      line = str_0 & line
+    if str_o.len > 0:
+      line = line & "\n" & str_o
+    if str_co.len > 0:
+      line = str_co & "\n" & line
+
+  for l in readLinesFromFileOrStdin(args):
+    var line = l
+    var matched = false
     if not regex:
-      var p = l.rfind(query)
+      var p = line.rfind(query)
       while p >= 0:
-        found = true
-        if str_a.len > 0:
-          l = l[0 .. p+query.len-1] & str_a & l[p+query.len .. l.len-1]
-        if str_i.len > 0:
-          l = l[0 .. p-1] & str_i & l[p .. l.len-1]
-        p = l.rfind(query, p)
-      if found:
-        if str_ca.len > 0:
-          l &= str_ca
-        if str_ci.len > 0:
-          var head = l.len
-          for m in l.findIter(re"\S"):
-            head = m.matchBounds.a
-            break
-          l = l[0 .. head-1] & str_ci & l[head .. l.len-1]
-        if str_0.len > 0:
-          l = str_0 & l
-        if str_o.len > 0:
-          l = l & "\n" & str_o
-        if str_co.len > 0:
-          l = str_co & "\n" & l
+        matched = true
+        add_each_pos(line, p)
+        p = line.rfind(query, p)
+      if matched:
+        add_each_line(line)
     else:
       var matches: seq[RegexMatch] = @[]
-      for m in l.findIter(re(query)):
-        found = true
+      for m in line.findIter(re(query)):
+        matched = true
         matches.add(m)
       for i in countdown(matches.len-1, 0):
         let p = matches[i].matchBounds.a
-        if str_a.len > 0:
-          l = l[0 .. p+query.len-1] & str_a & l[p+query.len .. l.len-1]
-        if str_i.len > 0:
-          l = l[0 .. p-1] & str_i & l[p .. l.len-1]
-      if found:
-        if str_ca.len > 0:
-          l &= str_ca
-        if str_ci.len > 0:
-          var head = l.len
-          for m in l.findIter(re"\S"):
-            head = m.matchBounds.a
-            break
-          l = l[0 .. head-1] & str_ci & l[head .. l.len-1]
-        if str_0.len > 0:
-          l = str_0 & l
-        if str_o.len > 0:
-          l = l & "\n" & str_o
-        if str_co.len > 0:
-          l = str_co & "\n" & l
-    echo l
+        add_each_pos(line, p)
+      if matched:
+        add_each_line(line)
+    echo line
 
