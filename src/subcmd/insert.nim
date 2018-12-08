@@ -13,11 +13,13 @@ proc insert*() =
     -A=<str>: append into line end.
     -o=<str>: insert the next line.
     -O=<str>: insert the previouos line.
+    -r      : regex.
 """
     stdout.write s
 
   var args: seq[string] = @[]
   var str_i, str_a, str_0, str_ci, str_ca, str_o, str_co = ""
+  var regex = false
 
   for kind, key, val in getopts():
     if kind == cmdArgument:
@@ -36,6 +38,8 @@ proc insert*() =
       str_o = val
     elif (kind == cmdShortOption and key == "O"):
       str_co = val
+    elif (kind == cmdShortOption and key == "r"):
+      regex = true
     else:
       usage()
       quit(0)
@@ -51,28 +55,55 @@ proc insert*() =
   for line in readLinesFromFileOrStdin(args):
     var l = line
     var found = false
-    var p = l.rfind(query)
-    while p >= 0:
-      found = true
-      if str_a.len > 0:
-        l = l[0 .. p+query.len-1] & str_a & l[p+query.len .. l.len-1]
-      if str_i.len > 0:
-        l = l[0 .. p-1] & str_i & l[p .. l.len-1]
-      p = l.rfind(query, p)
-    if found:
-      if str_ca.len > 0:
-        l &= str_ca
-      if str_ci.len > 0:
-        var head = l.len
-        for m in l.findIter(re"\S"):
-          head = m.matchBounds.a
-          break
-        l = l[0 .. head-1] & str_ci & l[head .. l.len-1]
-      if str_0.len > 0:
-        l = str_0 & l
-      if str_o.len > 0:
-        l = l & "\n" & str_o
-      if str_co.len > 0:
-        l = str_co & "\n" & l
+    if not regex:
+      var p = l.rfind(query)
+      while p >= 0:
+        found = true
+        if str_a.len > 0:
+          l = l[0 .. p+query.len-1] & str_a & l[p+query.len .. l.len-1]
+        if str_i.len > 0:
+          l = l[0 .. p-1] & str_i & l[p .. l.len-1]
+        p = l.rfind(query, p)
+      if found:
+        if str_ca.len > 0:
+          l &= str_ca
+        if str_ci.len > 0:
+          var head = l.len
+          for m in l.findIter(re"\S"):
+            head = m.matchBounds.a
+            break
+          l = l[0 .. head-1] & str_ci & l[head .. l.len-1]
+        if str_0.len > 0:
+          l = str_0 & l
+        if str_o.len > 0:
+          l = l & "\n" & str_o
+        if str_co.len > 0:
+          l = str_co & "\n" & l
+    else:
+      var matches: seq[RegexMatch] = @[]
+      for m in l.findIter(re(query)):
+        found = true
+        matches.add(m)
+      for i in countdown(matches.len-1, 0):
+        let p = matches[i].matchBounds.a
+        if str_a.len > 0:
+          l = l[0 .. p+query.len-1] & str_a & l[p+query.len .. l.len-1]
+        if str_i.len > 0:
+          l = l[0 .. p-1] & str_i & l[p .. l.len-1]
+      if found:
+        if str_ca.len > 0:
+          l &= str_ca
+        if str_ci.len > 0:
+          var head = l.len
+          for m in l.findIter(re"\S"):
+            head = m.matchBounds.a
+            break
+          l = l[0 .. head-1] & str_ci & l[head .. l.len-1]
+        if str_0.len > 0:
+          l = str_0 & l
+        if str_o.len > 0:
+          l = l & "\n" & str_o
+        if str_co.len > 0:
+          l = str_co & "\n" & l
     echo l
 
