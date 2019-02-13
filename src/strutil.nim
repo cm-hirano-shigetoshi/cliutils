@@ -11,6 +11,7 @@ import subcmd/shift
 import subcmd/pop
 import subcmd/count
 import subcmd/preg
+import subcmd/tokenize
 
 proc usage() =
   let s = """
@@ -27,6 +28,7 @@ Usage: strutil <COMMAND> [OPTIONS]... [FILE]
   pop        : pop last island.
   count      : count specified string for each line.
   preg       : print lines match with input.
+  tokenize   : smart tokenize.
 """
   stdout.writeline(s)
 
@@ -44,6 +46,7 @@ proc run(cmd: string) =
   elif cmd == "pop"        :pop()
   elif cmd == "count"      :count()
   elif cmd == "preg"       :preg()
+  elif cmd == "tokenize"   :tokenize()
 
 if paramCount() == 0:
   usage()
