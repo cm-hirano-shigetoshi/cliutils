@@ -13,6 +13,7 @@ proc tokenize*() =
     stdout.write s
 
   var delimiters = "!\"#$%&'()=^|@`[{;:*]},<>?"
+  delimiters &= " \t"
 
   var args: seq[string] = @[]
   for kind, key, val in getopts():
@@ -31,4 +32,5 @@ proc tokenize*() =
         stdout.writeline("")
       else:
         stdout.write(c)
+    stdout.writeline("")
 
